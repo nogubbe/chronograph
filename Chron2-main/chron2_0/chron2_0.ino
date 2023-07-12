@@ -106,6 +106,8 @@ void SpeedRenderer(float newVelocity, float newEnergy) {
 
   oled.clear(0, 35, 128, 64);       // очистка прошлой скорости
   oled.clear(35, 20, 45, 23);       // очистка прошлой энергии
+  oled.clear(90, 20, 129, 23);       // очистка прошлой скорости 0.2 ifhjv
+
 
   oled.setCursor(0,2);
   oled.print(String(BbMass));
