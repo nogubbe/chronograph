@@ -5,14 +5,14 @@ GyverOLED<SSD1306_128x64, OLED_NO_BUFFER> oled;
 uint8_t btnPlusPrev;
 #define btnMinusPin 5
 uint8_t btnMinusPrev;
-float dist=0.199;       //расстояние между датчиками в метрах  
-const int velocitiesArrMaxSize=4;  // количесво хранимых значений прошлых выстрелов
+float dist = 0.199;       //расстояние между датчиками в метрах  
+const int velocitiesArrMaxSize = 4;  // количесво хранимых значений прошлых выстрелов
 
 int set;  // режим
 
-int shotNum=0;            //номер выстрела, начиная с 1
+int shotNum = 0;            //номер выстрела, начиная с 1
 float velocity, energy;    //переменная для хранения скорости
-float BbMass=0.20;       //масса снаряда в килограммах
+float BbMass = 0.20;       //масса снаряда в килограммах
 volatile unsigned long gap1, gap2;    //отметки времени прохождения пулей датчиков
 float speed02 = 0.00;
 
@@ -25,12 +25,14 @@ String SpeedValuesArr[velocitiesArrMaxSize] = {
 
 
 void CalculateEnergy() {
-		energy=velocity*velocity*BbMass*0.001/2;  // вычисление энергии выстрела
+		energy = velocity * velocity * BbMass * 0.001 / 2;  // вычисление энергии выстрела
 }
 
+
 void ConvertEnergyToDefaultBb() {
-		speed02=sqrt(2 * energy / 0.0002);   // вычисление скорости выстрела шаром весом 0.2 гр на основе текущего выстрела используя его энергию и скорость
+		speed02 = sqrt(2 * energy / 0.0002);   // вычисление скорости выстрела шаром весом 0.2 гр на основе текущего выстрела используя его энергию и скорость
 }
+
 
 void RenderPreviousVelocities() {
   String previusSpeed = "";
@@ -44,6 +46,7 @@ void RenderPreviousVelocities() {
   };
   oled.print(previusSpeed);
 }
+
 
 void UpdateSpeedValuesArr() {
   for (int i = velocitiesArrMaxSize-1; i > 0; i--){
@@ -91,6 +94,7 @@ void VelocityMeasureRenderSetup() {
   oled.setScale(1);
 }
 
+
 void massRenrererUpdater() {
   oled.clear(0, 20, 24, 23);       // очистка значения энергии прошлого выстрела
   oled.setCursor(0,2);
@@ -134,9 +138,10 @@ void setup() {
   VelocityMeasureRenderSetup();
 
 	Serial.begin(9600);    //открываем COM порт
-	attachInterrupt(1,start,RISING);     //аппаратное прерывание при прохождении первого датчика
-	attachInterrupt(0,finish,RISING);      //аппаратное прерывание при прохождении второго датчика
+	attachInterrupt(1, start, RISING);     //аппаратное прерывание при прохождении первого датчика
+	attachInterrupt(0, finish, RISING);      //аппаратное прерывание при прохождении второго датчика
 }
+
 
 void CalibrateSensors() {  // режим калибровки датчиков
     Serial.print("sensor 1: ");
@@ -187,9 +192,10 @@ void OperatingModeSwitch() {
   }
 }
 
+
 void VelocityMeasure() {
   if (gap1!=0 && gap2!=0 && gap2>gap1 && set==0) {        //если пуля прошла оба датчика в 0 режиме
-		velocity=(1000000*(dist)/(gap2-gap1));         //вычисление скорости как расстояние/время
+		velocity=(1000000 * (dist) / (gap2-gap1));         //вычисление скорости как расстояние/время
 		energy=velocity*velocity*BbMass*0.001/2;              //вычисление энергии
 		Serial.print("Shot #");                        
 		Serial.println(shotNum);                                 //вывод номера выстрела
@@ -209,21 +215,23 @@ void VelocityMeasure() {
 	}
 }
 
+
 void VelocityMeasureFail() {
-	if (micros()-gap1>200000 && gap1!=0 && set!=1) { // (если пуля прошла первый датчик) И (прошла уже 0.2 секунды, а второй датчик не тронут)
+	if (micros() - gap1 > 200000 && gap1 != 0 && set != 1) { // (если пуля прошла первый датчик) И (прошла уже 0.2 секунды, а второй датчик не тронут)
 		Serial.println("FAIL"); //выдаёт FAIL через 1 секунду, если пуля прошла через первый датчик, а через второй нет
     velocity = 999.99;
     shotNum++;
     SpeedRender();
-		gap1=0;
-		gap2=0;
+		gap1 = 0;
+		gap2 = 0;
 	}
 }
 
+
 void start() 
 {
-	if (gap1==0) {   //если измерение еще не проводилось
-		gap1=micros(); //получаем время работы ардуино с момента включения до момента пролетания первой пули
+	if (gap1 == 0) {   //если измерение еще не проводилось
+		gap1 = micros(); //получаем время работы ардуино с момента включения до момента пролетания первой пули
 	}
 }
 
@@ -238,7 +246,7 @@ void finish()
 
 void loop() {
   OperatingModeSwitch();
-	if (set==1) {      
+	if (set == 1) {      
 		CalibrateSensors();
 	}
   VelocityMeasure();
